@@ -1,4 +1,5 @@
 {
     "CodeGPT.apiKey": "CodeGPT Plus Beta",
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "bitoAI.codeCompletion.enableAutoCompletion": false
 }
