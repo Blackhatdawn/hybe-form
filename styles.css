@@ -192,6 +192,7 @@ body {
   background-color: #8e44ad;
   color: #fff;
   transition: width 0.3s ease-in-out;
+  width: 0%; /* Initial width, will be updated by JS */
 }
 
 /* Footer styling */
@@ -221,7 +222,9 @@ footer.bg-gradient {
 
 /* Subscription amount gradient text */
 .subscription-amount .form-control-plaintext {
+  font-size: 1.5rem;
   background: var(--primary-gradient);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: #2c3e50;
@@ -404,4 +407,15 @@ footer a[lang='ko'] {
   .iti__country-list {
     transition: none;
   }
+}
+
+/* Checkmark icon for success */
+.success-checkmark {
+  font-size: 3rem;
+  color: #10b981;
+}
+
+/* Image fluidity and max-width */
+.img-fluid.max-width-150 {
+  max-width: 150px;
 }
