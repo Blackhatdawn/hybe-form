@@ -336,13 +336,23 @@ document.addEventListener("DOMContentLoaded", () => {
     iti = window.intlTelInput(phoneInput, {
       separateDialCode: true,
       initialCountry: "auto",
-      geoIpLookup: function (success, failure) {
+      geoIpLookup: function (success) {
         fetch("https://ipapi.co/json")
           .then((res) => res.json())
           .then((data) => success(data.country_code))
           .catch(() => success("US"));
       },
       utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.1/js/utils.js",
+    });
+    // Enhanced phone input error handling
+    phoneInput.addEventListener("input", () => {
+      if (!iti.isValidNumber()) {
+        phoneInput.classList.add("is-invalid");
+        document.getElementById("phone-error").textContent = "Please enter a valid phone number with country code.";
+      } else {
+        phoneInput.classList.remove("is-invalid");
+        document.getElementById("phone-error").textContent = "";
+      }
     });
   }
 
@@ -376,23 +386,32 @@ document.addEventListener("DOMContentLoaded", () => {
           resetButton();
           return;
         }
+        // Inline feedback for email
         if (!emailRegex.test(emailInput.value)) {
-          showMessage("Invalid email address.", "danger");
-          resetButton();
-          return;
+          emailInput.classList.add("is-invalid");
+          document.getElementById("email-error").textContent = "Please enter a valid email address.";
+        } else {
+          emailInput.classList.remove("is-invalid");
+          document.getElementById("email-error").textContent = "";
         }
         if (!iti || !iti.isValidNumber()) {
+          phoneInput.classList.add("is-invalid");
+          document.getElementById("phone-error").textContent = "Please enter a valid phone number with country code.";
           showMessage("Invalid phone number.", "danger");
           resetButton();
           return;
+        } else {
+          phoneInput.classList.remove("is-invalid");
+          document.getElementById("phone-error").textContent = "";
         }
-        phoneInput.value = iti.getNumber(); // Store E.164 format
-
+        // Inline feedback for DOB
         const dob = new Date(dobInput.value);
         if (isNaN(dob) || dobInput.value !== dob.toISOString().split("T")[0]) {
-          showMessage("Invalid date of birth. Use YYYY-MM-DD format.", "danger");
-          resetButton();
-          return;
+          dobInput.classList.add("is-invalid");
+          document.getElementById("dob-error").textContent = "Please enter a valid date of birth (YYYY-MM-DD).";
+        } else {
+          dobInput.classList.remove("is-invalid");
+          document.getElementById("dob-error").textContent = "";
         }
         const today = new Date();
         const age = today.getFullYear() - dob.getFullYear();
@@ -466,4 +485,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Global error listeners for enhanced error handling
+  window.addEventListener("error", function () {
+    showMessage("A script error occurred. Please refresh or contact support.", "danger");
+  });
+  window.addEventListener("unhandledrejection", function () {
+    showMessage("A network or script error occurred. Please try again.", "danger");
+  });
+
+  // Populate country dropdown with all countries
+  fetch("https://restcountries.com/v3.1/all")
+    .then(res => res.json())
+    .then(countries => {
+      countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+      countries.forEach(country => {
+        const option = document.createElement("option");
+        option.value = country.cca2;
+        option.textContent = country.name.common;
+        countrySelect.appendChild(option);
+      });
+    })
+    .catch(() => {
+      // fallback: add a few common countries
+      ["United States", "South Korea", "Japan", "United Kingdom"].forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        countrySelect.appendChild(option);
+      });
+    });
 });
